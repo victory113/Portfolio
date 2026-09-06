@@ -1,0 +1,16 @@
+# Normalise text files to LF in the repository, regardless of the machine
+# that committed them. Without this, the result depends on each contributor's
+# core.autocrlf setting, which is not a property of the project.
+* text=auto
+
+# Netlify serves these directly. Keep them LF on checkout too, so what is
+# tested locally is byte-identical to what is deployed.
+*.html text eol=lf
+*.toml text eol=lf
+*.svg  text eol=lf
+*.md   text eol=lf
+
+# Never touch binaries — line-ending conversion corrupts them.
+*.png binary
+*.jpg binary
+*.pdf binary
