@@ -1,0 +1,27 @@
+# Netlify configuration for a static site with no build step.
+# Everything in this folder is published as-is.
+
+[build]
+  publish = "."
+  command = ""
+
+# Security + privacy headers. Netlify applies these to every response.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# Images and the favicon never change without a new filename, so cache them hard.
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# The HTML itself must never be cached, or visitors see an old version after you deploy.
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"

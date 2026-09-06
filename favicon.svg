@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <style>
+    .bg { fill: #0E5C43; }
+    .fg { fill: #F3F4EF; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #5CC79E; }
+      .fg { fill: #101310; }
+    }
+  </style>
+  <rect class="bg" width="64" height="64" rx="12"/>
+  <text class="fg" x="32" y="43" text-anchor="middle"
+        font-family="Archivo, Helvetica Neue, Arial, sans-serif"
+        font-size="30" font-weight="700" letter-spacing="-1">VO</text>
+</svg>
