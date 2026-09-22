@@ -9,7 +9,7 @@
 <meta name="theme-color" content="#F3F4EF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#101310" media="(prefers-color-scheme: dark)">
 
-<!-- Link previews. REPLACE the domain below with your real Netlify URL after your first deploy. -->
+<!-- Link previews. REPLACE the domain below with real Netlify URL after your first deploy. -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Victory Orobosa">
 <meta property="og:title" content="Victory Orobosa — Software Engineer">
@@ -728,6 +728,87 @@
           <p class="pull">Omitting the terminal-state factor from the Bellman target is the classic DQN bug: training still runs, the loss still falls, and the agent quietly never learns to land.</p>
           <p>That is the failure mode the suite exists for &mdash; the bugs that produce a plausible-looking agent rather than a crash. Tests cover the Bellman target with and without terminal transitions, Double against vanilla target selection, the one-sided overestimation gap between them, soft-update arithmetic, and that a gradient step moves the policy network and not the target. CI adds a smoke job that runs two real training episodes against the actual environment, because unit tests mock the environment away and can't catch a broken artifact write.</p>
           <p>The ablation harness trains both Bellman variants under matched seeds and episode budgets, so the target computation is the only thing that differs between the arms.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- ============ PROJECT 3 ============ -->
+    <article class="project">
+      <div class="project-top reveal">
+        <div class="rail">
+          <p class="label" style="margin:0">2026 &middot; Team of 3<br>+ solo rebuild</p>
+          <p class="stack">C++20 &middot; CMake<br>cpp-httplib &middot; doctest<br>React &middot; TypeScript<br>GitHub Actions</p>
+        </div>
+        <div>
+          <h2>SearchFlix &mdash; which index should a search engine use?</h2>
+          <p class="prose-lead">A search engine over IMDb&rsquo;s full catalogue &mdash; 12.4 million movies, series and episodes &mdash; with the index behind it made swappable. Seven data structures answer the same queries over the same data, and a benchmark I rebuilt from scratch measures each one. No single structure wins.</p>
+          <div class="links">
+            <a href="https://github.com/victory113/searchflix">Source <span class="arrow">&rarr;</span></a>
+            <a href="https://github.com/victory113/searchflix/blob/main/docs/RESULTS.md">Full results <span class="arrow">&rarr;</span></a>
+          </div>
+        </div>
+      </div>
+
+      <figure class="reveal">
+        <button class="shot" type="button" data-lightbox="assets/searchflix-compare.png" aria-label="Enlarge the Compare screenshot">
+          <img src="assets/searchflix-compare.png" width="2560" height="1800" loading="lazy" decoding="async"
+               alt="The Compare page in dark mode: the query 'the dark' raced across seven indexes on a logarithmic scale. std::map and the sorted array answer in about 240 nanoseconds, the AVL tree and BST in about 425, the linked list in 18.6 milliseconds, and the hash table shows a hatched bar marked 'can't', with the reason underneath.">
+        </button>
+        <figcaption>
+          <span>Compare &mdash; one autocomplete query raced live across all seven indexes. The hash table can&rsquo;t answer it at all, and says why.</span>
+          <span class="hint">Click to enlarge</span>
+        </figcaption>
+      </figure>
+
+      <div class="readout reveal">
+        <div><span class="n">12.4M</span><span class="k">imdb titles</span></div>
+        <div><span class="n">7</span><span class="k">index structures</span></div>
+        <div><span class="n">91 ns</span><span class="k">hash lookup</span></div>
+        <div><span class="n">123/132</span><span class="k">results reproduce</span></div>
+        <div><span class="n">104</span><span class="k">tests, 3 compilers</span></div>
+      </div>
+
+      <div class="block reveal">
+        <div class="rail"><p class="label" style="margin:0">What it<br>found</p></div>
+        <div class="notes">
+          <p class="pull">The fastest structure for finding a title is the one structure that can&rsquo;t do autocomplete.</p>
+          <p>At all 12.4 million titles, a hash table finds an exact title in <strong>91 ns</strong>, about 23&times; faster than any tree. But hashing scatters keys, so it cannot answer &ldquo;everything starting with <em>the dark</em>&rdquo; short of checking every title. Among the ordered structures, a sorted array gives the fastest autocomplete (<strong>1.88 &micro;s</strong>) in the least memory &mdash; and costs <strong>27 ms</strong> per insert, because everything after the new title has to move. A balanced tree does both in microseconds.</p>
+          <p>So a real engine pairs a hash index for exact matches with an ordered one for prefixes, and picks the ordered one by how often the data changes. It&rsquo;s the same choice a database makes between a hash index and a B-tree, measured instead of recited.</p>
+        </div>
+      </div>
+
+      <div class="block reveal">
+        <div class="rail"><p class="label" style="margin:0">What the<br>rebuild fixed</p></div>
+        <div class="notes">
+          <p>This began as a class project comparing five structures on random integers. Coming back to it, I found it didn&rsquo;t build &mdash; it included a header that wasn&rsquo;t in the repository &mdash; and none of its numbers could be reproduced.</p>
+          <div class="principle">
+            <h3>The stopwatch couldn&rsquo;t see what it was timing.</h3>
+            <p>Every search was timed in milliseconds, so AVL, BST and hash table all read as &ldquo;1&rdquo;. That was the smallest value the timer could show, not a result. The clock on this machine ticks every 100 ns &mdash; roughly the cost of one hash lookup &mdash; so operations are now timed in batches, with a warm-up, and reported as the median of up to 200 samples.</p>
+          </div>
+          <div class="principle">
+            <h3>The hash table was quadratic.</h3>
+            <p>It had ten buckets that never grew, so every insert walked a longer chain. I timed the original, unmodified: 100,000 keys took 5.7 seconds, while the README claimed 10 million in 4.2. I kept the team&rsquo;s separate-chaining design and rewrote it to resize. It now matches <span class="mono">std::unordered_map</span> on lookups and uses 8% less memory.</p>
+          </div>
+          <div class="principle">
+            <h3>The data wasn&rsquo;t what I assumed.</h3>
+            <p>I profiled IMDb&rsquo;s files before writing a parser. 12.8 million rows held only 5.7 million distinct titles &mdash; &ldquo;Episode #1.1&rdquo; appears 60,420 times &mdash; so the scale I&rsquo;d planned to claim wasn&rsquo;t real. Joining episodes to their series (&ldquo;breaking bad s1e1 pilot&rdquo;) made 11.7 million distinct keys and made episodes searchable. A separately written Python profile and the C++ loader agree on that count to the last digit.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="block reveal">
+        <div class="rail"><p class="label" style="margin:0">The benchmark<br>disagreed with itself</p></div>
+        <div class="notes">
+          <p class="pull">Two identical runs disagreed on 106 of 132 measurements. Every structure had shifted by the same factor, so the code hadn&rsquo;t changed. The machine had.</p>
+          <p>The laptop has hybrid performance and efficiency cores and was on battery, so Windows was moving the benchmark between them. It now pins itself to a performance core, opts out of power throttling and spins the core up before measuring. 123 of 132 cells now agree within 20% across runs, and the nine that don&rsquo;t are marked in the results rather than dropped.</p>
+          <p>Memory is counted exactly by replacing <span class="mono">operator new</span>, and the catalogue fits 12.4 million titles in 625 MB by packing each one into a 32-byte record. Stored the obvious way, it would have needed about 2.5 GB before any index existed.</p>
+        </div>
+      </div>
+
+      <div class="block reveal">
+        <div class="rail"><p class="label" style="margin:0">What I owned</p></div>
+        <div class="notes">
+          <p>The original BST and AVL tree are my team&rsquo;s algorithms, ported with credit in each file; all seven structures pass one shared contract test, so the team&rsquo;s AVL tree is now proven to stay balanced. The rebuild &mdash; data pipeline, compact catalogue, sorted array, benchmark method, HTTP server, React UI and CI on MSVC, GCC and Clang with sanitizers &mdash; is my own.</p>
         </div>
       </div>
     </article>
