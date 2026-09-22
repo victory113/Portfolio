@@ -1,53 +1,34 @@
-# Portfolio — Victory Orobosa
+# Victory Orobosa's Portfolio
 
-**Live site: [victoryorobosa.netlify.app](https://victoryorobosa.netlify.app/)** ·
-[Resume (PDF)](https://victoryorobosa.netlify.app/assets/Victory-Orobosa-Resume.pdf) ·
-[LinkedIn](https://www.linkedin.com/in/victory-orobosa/)
+This is the code for my personal portfolio site. You can see it live at
+https://victoryorobosa.netlify.app.
 
-The projects on it:
+I'm a Computer Science student at the University of Central Arkansas, graduating in
+Spring 2027. The site covers three projects I've built:
 
-- **[AI Supply Chain Intelligence Platform](https://github.com/victory113/supply-chain-analyzer)** — turns any shipment CSV into computed KPIs, a risk score, and grounded explanations. [Live demo](https://supply-chain-analyzer.netlify.app/)
-- **[SearchFlix](https://github.com/victory113/searchflix)** — which index should a search engine use? Seven data structures benchmarked over 12.4M IMDb titles
-- **[Double DQN — Lunar Lander](https://github.com/victory113/dqn-lunar-lander)** — a reinforcement learning ablation that contradicted the expected result
+- [AI Supply Chain Intelligence Platform](https://github.com/victory113/supply-chain-analyzer):
+  upload a shipment spreadsheet and get KPIs, a risk score, and explanations of what's
+  driving it. There's also a [live demo](https://supply-chain-analyzer.netlify.app/).
+- [SearchFlix](https://github.com/victory113/searchflix): a movie search engine over
+  12.4 million IMDb titles that I used to benchmark seven data structures against each other.
+- [Double DQN Lunar Lander](https://github.com/victory113/dqn-lunar-lander): a
+  reinforcement learning agent, plus an experiment comparing two versions of the algorithm.
 
-A single-page portfolio. No framework, no build step: one HTML file, one stylesheet
-(inline), one script (inline), and a folder of images.
+My resume is on the site too:
+[Victory-Orobosa-Resume.pdf](https://victoryorobosa.netlify.app/assets/Victory-Orobosa-Resume.pdf).
+You can also find me on [LinkedIn](https://www.linkedin.com/in/victory-orobosa/).
 
-```
-portfolio/
-├── index.html      The whole site — markup, styles, and behaviour
-├── favicon.svg     Browser-tab icon, adapts to light/dark
-├── netlify.toml    Netlify config: publish directory, headers, caching
-├── assets/         Files referenced by index.html
-│   ├── dashboard.png, dqn_divergence.png, searchflix-compare.png   project screenshots
-│   ├── og-card.png                  the link-preview card
-│   └── Victory-Orobosa-Resume.pdf   the resume linked from the header and contact card
-└── README.md
-```
+## How it's built
 
-## Running it locally
+It's one page written in plain HTML, CSS and JavaScript, so there's nothing to install
+or build. Everything lives in `index.html`, and the images and resume are in `assets/`.
 
-Open `index.html` in a browser, or — better, because it matches how Netlify serves it —
-use the VS Code **Live Server** extension: right-click `index.html` → *Open with Live Server*.
+To run it locally, open `index.html` in a browser. I use the Live Server extension in
+VS Code, which serves it the same way Netlify does.
 
-## Deploying
-
-Pushed to GitHub and connected to Netlify. Every push to `main` redeploys automatically.
-
-- Build command: *(none)*
-- Publish directory: `.`
-
-## Link previews
-
-The `og:` and `twitter:` meta tags at the top of `index.html` point at
-`https://victoryorobosa.netlify.app/` and `assets/og-card.png`. They render the
-preview card when the link is pasted into LinkedIn, Slack, or a DM. If the site
-ever moves to a custom domain, update them and the `canonical` link together.
+The site is hosted on Netlify and redeploys automatically whenever I push to `main`.
 
 ## Adding a project
 
-Copy an existing `<article class="project">` block in `index.html` and edit it. Each one has
-the same four parts: the `project-top` header (dates, stack, summary, links), an optional
-`figure`, a `readout` strip of verified numbers, and one or more `block` sections of prose.
-
-Keep `class="reveal"` on anything that should fade in on scroll.
+Each project on the page is an `<article class="project">` block in `index.html`. To add
+one, I copy an existing block and change the text, links and screenshot.
