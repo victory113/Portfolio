@@ -580,10 +580,10 @@
 
       <div class="readout reveal">
         <div><span class="n">50</span><span class="k">canonical fields</span></div>
-        <div><span class="n">~350</span><span class="k">column aliases</span></div>
+        <div><span class="n">~400</span><span class="k">column aliases</span></div>
         <div><span class="n">100 MB</span><span class="k">max upload</span></div>
         <div><span class="n">14s</span><span class="k">300k rows, was 84s</span></div>
-        <div><span class="n">318</span><span class="k">tests passing</span></div>
+        <div><span class="n">368</span><span class="k">tests passing</span></div>
       </div>
 
       <div class="block reveal">
@@ -629,12 +629,16 @@
             <p>Three hundred thousand rows took 84 seconds, and I assumed the cost was structural. It was an exception handler: matching one of eighteen date formats means raising and catching an error for every format ahead of the right one, twice per row &mdash; about three million exceptions. A year of shipments contains only a few hundred distinct date strings, so caching the format lookup collapsed it. Same file, 14 seconds.</p>
           </div>
           <div class="principle">
+            <h3>Let the model choose what to look up, not what it can see.</h3>
+            <p>Chat started as a keyword router: the server scanned a question for words like &ldquo;vendor&rdquo; or &ldquo;trend&rdquo; and decided which metrics to send. It answered the questions I anticipated and failed quietly on the rest &mdash; a question about carriers pulled vendor data because &ldquo;who&rdquo; was on the keyword list, and nothing said the wrong thing had been fetched. Now Claude gets nine tools over the analytics layer and chooses its own path, so &ldquo;which carrier is worst, and is it getting better?&rdquo; becomes a carrier lookup, then a trend lookup. Letting a model steer is only safe with hard edges: every tool is scoped to the signed-in user and takes a dataset <em>name</em>, never an ID it could invent; tool errors come back as data the model can recover from; the loop stops after six steps; and every call is shown to the user, because with the model choosing its own evidence, that trace is how you tell a grounded answer from a lucky one.</p>
+          </div>
+          <div class="principle">
             <h3>Degrading gracefully is not the same as degrading cheaply.</h3>
             <p>With Redis down the app technically fell back to &ldquo;no cache&rdquo; &mdash; while the client library silently retried every refused connection, so a single page paid about eight seconds. A circuit breaker now opens after three consecutive failures. It also cut the test suite from 146 seconds to 22. The Celery broker had the uglier version of the same problem: with it down, uploads hung indefinitely, and disabling the connection loop globally would have stopped a live worker from ever reconnecting. The API now probes the broker itself before publishing and falls straight through to in-process execution. Hanging uploads became a response in 1.4 seconds.</p>
           </div>
           <div class="principle">
             <h3>One canonical model, many source schemas.</h3>
-            <p>Real companies receive shipment data from dozens of ERP, WMS, TMS and carrier systems. So the app doesn't parse a format &mdash; it maps any export onto one 50-field canonical record through roughly 350 aliases and a deliberately conservative fuzzy pass, because a <em>wrong</em> mapping is far worse than an unmapped column: it silently feeds bad numbers into every metric downstream. When an alias collision let one field quietly swallow another's data, I wrote a test that walks the entire table and fails on any header claimed twice. It found two more dead entries.</p>
+            <p>Real companies receive shipment data from dozens of ERP, WMS, TMS and carrier systems. So the app doesn't parse a format &mdash; it maps any export onto one 50-field canonical record through roughly 400 aliases and a deliberately conservative fuzzy pass, because a <em>wrong</em> mapping is far worse than an unmapped column: it silently feeds bad numbers into every metric downstream. When an alias collision let one field quietly swallow another's data, I wrote a test that walks the entire table and fails on any header claimed twice. It found two more dead entries.</p>
           </div>
         </div>
       </div>
