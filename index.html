@@ -583,7 +583,7 @@
         <div><span class="n">~400</span><span class="k">column aliases</span></div>
         <div><span class="n">100 MB</span><span class="k">max upload</span></div>
         <div><span class="n">14s</span><span class="k">300k rows, was 84s</span></div>
-        <div><span class="n">368</span><span class="k">tests passing</span></div>
+        <div><span class="n">379</span><span class="k">tests passing</span></div>
       </div>
 
       <div class="block reveal">
@@ -636,6 +636,11 @@
             <h3>Degrading gracefully is not the same as degrading cheaply.</h3>
             <p>With Redis down the app technically fell back to &ldquo;no cache&rdquo; &mdash; while the client library silently retried every refused connection, so a single page paid about eight seconds. A circuit breaker now opens after three consecutive failures. It also cut the test suite from 146 seconds to 22. The Celery broker had the uglier version of the same problem: with it down, uploads hung indefinitely, and disabling the connection loop globally would have stopped a live worker from ever reconnecting. The API now probes the broker itself before publishing and falls straight through to in-process execution. Hanging uploads became a response in 1.4 seconds.</p>
           </div>
+          <div class="principle">
+            <h3>A metric label is a decision about cost.</h3>
+            <p>The service reports on itself at <span class="mono">/metrics</span> in Prometheus format &mdash; requests and latency, rows ingested, delays derived, analyses by outcome, which tools the agent chose, tokens billed. The interesting constraint is that Prometheus keeps one time series per distinct label combination, so labelling a request by its raw path would mint a fresh series for every upload ID anyone had ever opened: fine in testing, and a monitoring system that no longer fits in memory some months later. Requests are labelled by the matched route template instead, and anything matching no route collapses into a single bucket so a 404 scanner can&rsquo;t create series at will. The endpoint is unauthenticated like the health probes, which is only defensible because the payload is aggregate &mdash; counts and durations, never a user, a filename or a vendor &mdash; and there&rsquo;s a test that uploads a file called <span class="mono">confidential-q4-plan.csv</span> and asserts the name appears nowhere in it.</p>
+          </div>
+
           <div class="principle">
             <h3>One canonical model, many source schemas.</h3>
             <p>Real companies receive shipment data from dozens of ERP, WMS, TMS and carrier systems. So the app doesn't parse a format &mdash; it maps any export onto one 50-field canonical record through roughly 400 aliases and a deliberately conservative fuzzy pass, because a <em>wrong</em> mapping is far worse than an unmapped column: it silently feeds bad numbers into every metric downstream. When an alias collision let one field quietly swallow another's data, I wrote a test that walks the entire table and fails on any header claimed twice. It found two more dead entries.</p>
